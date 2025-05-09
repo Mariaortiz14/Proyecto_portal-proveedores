@@ -139,3 +139,6 @@ def tareas(request):
 def propuestas(request):
     propuestas = propuestas_sol.objects.filter(id_homologacion__usuario_hologa=request.user.id)
     return render(request, 'proveedores/propuestas/propuestas.html', {'propuestas':propuestas})
+
+def gestion_proveedores_vue(request):
+    return render(request, 'proveedores/vue/proveedores.html')

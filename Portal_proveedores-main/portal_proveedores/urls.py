@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import include, path
 from django.views.generic import RedirectView
+"""Url de la aplicacion principal de la aplicacion Portal_proveedores """
 
 urlpatterns = [
     path('', RedirectView.as_view(url='users/login/', permanent=False), name='redirection_principal'),
@@ -26,8 +27,21 @@ urlpatterns = [
     path('proveedores/', include('proveedores.urls')),
     path('compras/', include('compras.urls')),
     path('admin/', admin.site.urls),
+    path('proveedor/', include('proveedores.urls')),
+    path('api/', include('proveedores.api_urls')),
+
     
 ]
+# Configuración de Sentry para el monitoreo de errores
+# from sentry_sdk import init
+# init(dsn="https://f98603808507410082228881a23684b3@sentry.io/1449108")
+# Configuración de Sentry para el monitoreo de errores
+# sentry_sdk.init(
+#     dsn="https://f98603808507410082228881a23684b3@sentry.io/1449108",
+#     integrations=[DjangoIntegration()],
+#     traces_sample_rate=1.0,
+#     send_default_pii=True,
+# )  
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -47,8 +47,17 @@ INSTALLED_APPS = [
     'proveedores',
     'compras',
     'fontawesomefree',
-
+    'rest_framework',  
+    'rest_framework.authtoken', 
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
