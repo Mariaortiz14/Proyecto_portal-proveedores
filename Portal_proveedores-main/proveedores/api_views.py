@@ -4,11 +4,13 @@ from .serializers import RegistroFormularioSerializer
 from users.models import Departamento, Municipio
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 
 class ProveedorViewSet(viewsets.ModelViewSet):
     queryset = registro_formulario.objects.all()
     serializer_class = RegistroFormularioSerializer
+    permission_classes = [AllowAny]
 
 
 @api_view(['GET'])

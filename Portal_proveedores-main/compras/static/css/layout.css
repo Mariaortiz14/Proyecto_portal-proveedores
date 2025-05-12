@@ -412,3 +412,9 @@ textarea.form-control {
   border-left: 2px solid #ddd;
   padding-left: 10px;
 }
+
+select option {
+  background-color: #ffffff; /* fondo blanco */
+  color: #000000; /* texto negro */
+  font-size: 14px;
+}

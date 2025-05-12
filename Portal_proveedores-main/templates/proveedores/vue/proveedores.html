@@ -2,36 +2,28 @@
 {% block content %}
 <div id="app" class="p-4">
   <h2 class="text-xl font-bold mb-4">Gestión de Proveedores</h2>
-
-  <!-- FORMULARIO NUEVO PROVEEDOR -->
   <form @submit.prevent="crearProveedor" class="mb-6 border p-4 rounded">
     <h3 class="text-lg font-semibold mb-2">Crear nuevo proveedor</h3>
-
     <div class="mb-2">
       <label>Razón Social:</label>
       <input v-model="nuevo.razon_social" type="text" class="border p-1 w-full">
     </div>
-
     <div class="mb-2">
       <label>Tipo Documento:</label>
       <input v-model="nuevo.tipo_documento" type="text" class="border p-1 w-full">
     </div>
-
     <div class="mb-2">
       <label>Documento:</label>
       <input v-model="nuevo.documento" type="text" class="border p-1 w-full">
     </div>
-
     <div class="mb-2">
       <label>Email:</label>
       <input v-model="nuevo.email" type="email" class="border p-1 w-full">
     </div>
-
     <div class="mb-2">
       <label>Teléfono:</label>
       <input v-model="nuevo.telefono" type="text" class="border p-1 w-full">
     </div>
-    <!-- SELECT DEPARTAMENTO -->
     <div class="mb-2">
       <label>Departamento:</label>
       <select v-model="nuevo.departamento" @change="cargarMunicipios" class="border p-1 w-full">
@@ -39,17 +31,14 @@
         <option v-for="d in departamentos" :value="d.codigo">{{ d.nombre }}</option>
       </select>
     </div>
-
-    <!-- Seleccionar municipio -->
     <div class="mb-2">
       <label>Municipio:</label>
       <select v-model="nuevo.municipio" class="border p-1 w-full">
         <option disabled value="">Selecciona un municipio</option>
         <option v-for="m in municipios" :value="m.codigo">{{ m.nombre }}</option>
       </select>
+      
     </div>
-
-    <!-- SELECT SECCIÓN -->
     <div class="mb-2">
       <label>Sección CIIU:</label>
       <select v-model="nuevo.seccion" @change="cargarDivisiones" class="border p-1 w-full">
@@ -57,8 +46,6 @@
         <option v-for="s in secciones" :value="s.codigo">{{ s.descripcion }}</option>
       </select>
     </div>
-
-    <!-- SELECT DIVISIÓN -->
     <div class="mb-2">
       <label>División:</label>
       <select v-model="nuevo.division" @change="cargarGrupos" class="border p-1 w-full">
@@ -66,8 +53,6 @@
         <option v-for="d in divisiones" :value="d.codigo">{{ d.descripcion }}</option>
       </select>
     </div>
-
-    <!-- SELECT GRUPO -->
     <div class="mb-2">
       <label>Grupo:</label>
       <select v-model="nuevo.grupo" @change="cargarClases" class="border p-1 w-full">
@@ -75,8 +60,6 @@
         <option v-for="g in grupos" :value="g.codigo">{{ g.descripcion }}</option>
       </select>
     </div>
-
-    <!-- SELECT CLASE -->
     <div class="mb-2">
       <label>Clase:</label>
       <select v-model="nuevo.clase" class="border p-1 w-full">
@@ -84,15 +67,10 @@
         <option v-for="c in clases" :value="c.codigo">{{ c.descripcion }}</option>
       </select>
     </div>
-
-
     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
       Guardar
     </button>
-
   </form>
-
-  <!-- TABLA DE PROVEEDORES -->
   <table border="1" class="w-full text-left">
     <thead>
       <tr>
@@ -113,18 +91,14 @@
       </tr>
     </tbody>
   </table>
-  
 </div>
-
-
-<!-- Vue + Axios -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  new Vue({
+  const vm = new Vue({
     el: '#app',
     data: {
       proveedores: [],
@@ -165,32 +139,58 @@
       cargarDepartamentos() {
         axios.get('/api/departamentos/')
           .then(response => {
-            this.departamentos = response.data;
+            this.departamentos = JSON.parse(JSON.stringify(response.data));
           });
       },
       cargarMunicipios() {
           console.log("Departamento seleccionado:", this.nuevo.departamento);  
-          if (!this.nuevo.departamento) return; // Evita llamadas innecesarias
+          if (!this.nuevo.departamento) return; 
           axios.get(`/api/municipios/${this.nuevo.departamento}/`)
             .then(response => {
-              this.municipios = response.data; // Actualiza los municipios
-              this.nuevo.municipio = ''; // Reinicia el municipio seleccionado
+              this.municipios = response.data; 
+              this.nuevo.municipio = ''; 
             })
             .catch(error => {
               console.error("Error al cargar municipios:", error);
             });
         },
       crearProveedor() {
-        axios.post('/api/proveedores/', {
-        razon_social: this.nuevo.razon_social,
-        tipo_documento: this.nuevo.tipo_documento,
-        documento: this.nuevo.documento,
-        email: this.nuevo.email,
-        telefono: this.nuevo.telefono,
-        municipio: this.nuevo.municipio,
-        departamento: this.nuevo.departamento,
-        ciiu: this.nuevo.clase  // Agrega el campo ciiu
-      })
+          if (!this.nuevo.razon_social || !this.nuevo.tipo_documento || !this.nuevo.documento || !this.nuevo.email || !this.nuevo.telefono) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Campos obligatorios',
+              text: 'Por favor completa todos los campos obligatorios.'
+            });
+            return;
+          }
+
+          if (!this.nuevo.departamento || !this.nuevo.municipio) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Ubicación incompleta',
+              text: 'Debes seleccionar el departamento y municipio.'
+            });
+            return;
+          }
+
+          if (!this.nuevo.clase) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Actividad económica faltante',
+              text: 'Debes seleccionar una clase CIIU antes de guardar.'
+            });
+            return;
+          }
+          axios.post('/api/proveedores/', {
+            razon_social: this.nuevo.razon_social,
+            tipo_documento: this.nuevo.tipo_documento,
+            documento: this.nuevo.documento,
+            email: this.nuevo.email,
+            telefono: this.nuevo.telefono,
+            municipio: this.nuevo.municipio,
+            departamento: this.nuevo.departamento,
+            ciiu: this.nuevo.clase
+          })
           .then(response => {
             Swal.fire({
               icon: 'success',
@@ -205,9 +205,16 @@
               email: '',
               telefono: '',
               departamento: '',
-              municipio: ''
+              municipio: '',
+              seccion: '',
+              division: '',
+              grupo: '',
+              clase: ''
             };
             this.municipios = [];
+            this.divisiones = [];
+            this.grupos = [];
+            this.clases = [];
             this.cargarProveedores();
           })
           .catch(error => {
@@ -218,8 +225,9 @@
               text: 'Verifica los campos e inténtalo de nuevo.'
             });
           });
-      },
-          cargarSecciones() {
+        },
+
+      cargarSecciones() {
       axios.get('/api/secciones/')
         .then(response => {
           this.secciones = response.data;
@@ -256,6 +264,11 @@
       }
   });
 </script>
-
-
 {% endblock %}
+
+<style>
+select option {
+  color: black !important;
+  background-color: white !important;
+}
+</style>
